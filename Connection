@@ -1,0 +1,1 @@
+CREATE TABLE Test(Column1 varchar(10))

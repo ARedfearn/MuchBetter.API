@@ -1,0 +1,30 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "io.ratpack:ratpack-gradle:1.7.3"
+    }
+}
+
+plugins {
+    id 'java'
+}
+
+group 'MIR.Interviwer.API'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+apply plugin: "io.ratpack.ratpack-java"
+
+ratpack.baseDir = file('ratpack')
