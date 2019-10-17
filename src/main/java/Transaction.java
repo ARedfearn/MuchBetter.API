@@ -1,8 +1,6 @@
-import java.util.Date;
-
 public class Transaction {
 
-    public Date Date;
+    public java.util.Date Date;
     public String Description;
     public int Amount;
     public String Currency;
