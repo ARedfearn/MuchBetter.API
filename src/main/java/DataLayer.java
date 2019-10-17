@@ -9,9 +9,6 @@ import java.util.Date;
 
 public class DataLayer {
 
-    public Boolean Error = false;
-    public String ErrorMessage;
-
     private Class Driver;
     {
         try {
@@ -25,55 +22,43 @@ public class DataLayer {
 
     }
 
-    public ResultSet GetUser(User user) {
+    public ResultSet GetUser(User user) throws SQLException {
         ResultSet rs = null;
 
-        try{
-            String token = user.Token;
-            if(user.Token == null){
-                //If no Token is passed we need to add a new User. This is the requirement of the /login endpoint.
-                token = AddUser();
-            }
-
-            //Constructing the SQL Statement to be executed by the H2 Database
-            //The users are selected from the USER table part of the MUCHBETTER_API Schema. The ? is a parameter which is set below.
-            String sqlSelect = ("SELECT * FROM MUCHBETTER_API.USERS " +
-                                "WHERE TOKEN = ?");
-
-            //Connecting to the H2 database, a tcp connection is used as this allows multiple connections at once.
-            Connection connection = DriverManager.getConnection("jdbc:h2:tcp://localhost/~/test", "sa", "");
-            PreparedStatement statement = connection.prepareStatement(sqlSelect);
-            statement.setString(1, token);
-
-            //The statement returns a table(result set) from the H2 database which is passed back to the calling class.
-            rs = statement.executeQuery();
+        String token = user.Token;
+        if(user.Token == null){
+            //If no Token is passed we need to add a new User. This is the requirement of the /login endpoint.
+            token = AddUser();
         }
-        catch(SQLException e){
-            Error = true;
-            ErrorMessage = e.getMessage();
-        }
+
+        //Constructing the SQL Statement to be executed by the H2 Database
+        //The users are selected from the USER table part of the MUCHBETTER_API Schema. The ? is a parameter which is set below.
+        String sqlSelect = ("SELECT * FROM MUCHBETTER_API.USERS " +
+                            "WHERE TOKEN = ?");
+
+        //Connecting to the H2 database, a tcp connection is used as this allows multiple connections at once.
+        Connection connection = DriverManager.getConnection("jdbc:h2:tcp://localhost/~/test", "sa", "");
+        PreparedStatement statement = connection.prepareStatement(sqlSelect);
+        statement.setString(1, token);
+
+        //The statement returns a table(result set) from the H2 database which is passed back to the calling class.
+        rs = statement.executeQuery();
 
         return rs;
     }
 
-    public ResultSet GetTransaction(String token) {
+    public ResultSet GetTransaction(String token) throws SQLException {
         ResultSet rs = null;
 
-        try{
-            //Constructing the SQL Statement to be executed by the H2 Database
-            //The users are selected from the USER table part of the MUCHBETTER_API Schema. The ? is a parameter which is set below.
-            String sqlSelect = ("SELECT * FROM MUCHBETTER_API.TRANSACTIONS " +
-                                "WHERE TOKEN = ?");
+        //Constructing the SQL Statement to be executed by the H2 Database
+        //The users are selected from the USER table part of the MUCHBETTER_API Schema. The ? is a parameter which is set below.
+        String sqlSelect = ("SELECT * FROM MUCHBETTER_API.TRANSACTIONS " +
+                            "WHERE TOKEN = ?");
 
-            Connection connection = DriverManager.getConnection("jdbc:h2:tcp://localhost/~/test", "sa", "");
-            PreparedStatement statement = connection.prepareStatement(sqlSelect);
-            statement.setString(1, token);
-            rs = statement.executeQuery();
-        }
-        catch (SQLException e){
-            Error = true;
-            ErrorMessage = e.getMessage();
-        }
+        Connection connection = DriverManager.getConnection("jdbc:h2:tcp://localhost/~/test", "sa", "");
+        PreparedStatement statement = connection.prepareStatement(sqlSelect);
+        statement.setString(1, token);
+        rs = statement.executeQuery();
 
         return rs;
     }
@@ -127,28 +112,22 @@ public class DataLayer {
         return token;
     }
 
-    public void AddTransaction(String token, Date date, String description, int amount, String currency) {
-        try {
-            String sqlInsert = ("INSERT INTO MUCHBETTER_API.TRANSACTIONS (TOKEN, TRANDATE, DESCRIPTION, AMOUNT, CURRENCY) " +
-                                "VALUES (?, ?, ?, ?, ?)");
+    public void AddTransaction(String token, Date date, String description, int amount, String currency) throws SQLException {
+        String sqlInsert = ("INSERT INTO MUCHBETTER_API.TRANSACTIONS (TOKEN, TRANDATE, DESCRIPTION, AMOUNT, CURRENCY) " +
+                            "VALUES (?, ?, ?, ?, ?)");
 
-            Connection connection = DriverManager.getConnection("jdbc:h2:tcp://localhost/~/test", "sa", "");
-            PreparedStatement statement = connection.prepareStatement(sqlInsert);
-            statement.setString(1, token);
-            statement.setDate(2, (java.sql.Date) date);
-            statement.setString(3, description);
-            statement.setInt(4, amount);
-            statement.setString(5, currency);
+        Connection connection = DriverManager.getConnection("jdbc:h2:tcp://localhost/~/test", "sa", "");
+        PreparedStatement statement = connection.prepareStatement(sqlInsert);
+        statement.setString(1, token);
+        statement.setDate(2, (java.sql.Date) date);
+        statement.setString(3, description);
+        statement.setInt(4, amount);
+        statement.setString(5, currency);
 
-            statement.executeUpdate();
+        statement.executeUpdate();
 
-            //Upon adding any transaction we must update the users balance.
-            UpdateBalance(token);
-        }
-        catch(SQLException e){
-            Error = true;
-            ErrorMessage = e.getMessage();
-        }
+        //Upon adding any transaction we must update the users balance.
+        UpdateBalance(token);
     }
 
     private void UpdateBalance(String token) throws SQLException {

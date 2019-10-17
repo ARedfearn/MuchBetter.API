@@ -8,13 +8,13 @@ public class TransactionCollection implements Iterable<Transaction> {
     private final List<Transaction> list = new ArrayList<Transaction>();
     private String Token;
 
-    public TransactionCollection(String token) throws SQLException{
+    public TransactionCollection(String token) throws SQLException {
         //Upon calling this Class it is populated with each transaction for the specified Token
         Token = token;
         GetTransactions();
     }
 
-    private void GetTransactions() throws SQLException{
+    private void GetTransactions() throws SQLException {
         DataLayer dl = new DataLayer();
         ResultSet rs = dl.GetTransaction(Token);
 
@@ -22,6 +22,7 @@ public class TransactionCollection implements Iterable<Transaction> {
         //Iterating through this class will return each Transaction
         while (rs.next()) {
             Transaction t = new Transaction();
+
             t.Date = rs.getDate(3);
             t.Description = rs.getString(4);
             t.Amount = rs.getInt(5);

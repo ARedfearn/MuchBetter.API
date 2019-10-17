@@ -14,7 +14,7 @@ public class Main {
                 .handlers(c -> c
                         .path("login", ctx -> {
                             //GET; Creates a new User. Returns a generated Token and Initial Balance, Currency and Transactions.
-                            Process.ProcessRequest process = new Process.ProcessRequest();
+                            Process process = new Process();
                             String response = process.Login();
                             ctx.getResponse().status(process.Status).send(response);
                         })
@@ -23,7 +23,7 @@ public class Main {
                             Headers headers = ctx.getRequest().getHeaders();
                             String token = headers.get("Authorization");
 
-                            Process.ProcessRequest process = new Process.ProcessRequest(token);
+                            Process process = new Process(token);
                             String response = process.Balance();
 
                             ctx.getResponse().status(process.Status).send(response);
@@ -33,7 +33,7 @@ public class Main {
                             Headers headers = ctx.getRequest().getHeaders();
                             String token = headers.get("Authorization");
 
-                            Process.ProcessRequest process = new Process.ProcessRequest(token);
+                            Process process = new Process(token);
                             String response = process.Transaction();
 
                             ctx.getResponse().status(process.Status).send(response);
@@ -45,7 +45,7 @@ public class Main {
                             Headers headers = ctx.getRequest().getHeaders();
                             String token = headers.get("Authorization");
 
-                            Process.ProcessRequest process = new Process.ProcessRequest(token);
+                            Process process = new Process(token);
                             String response = process.Spend(params);
                             ctx.getResponse().status(process.Status).send(response);
                         })

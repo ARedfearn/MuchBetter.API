@@ -1,12 +1,12 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import ratpack.util.MultiValueMap;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 
    /*
         Here the requests are processed, a method for each endpoint. Each method calls the Class User
@@ -15,95 +15,138 @@ import java.util.Arrays;
         and value of identifier. This two dimensional array is converted to JSON and passed back to the calling class.
     */
 
+
 public class Process {
+    private String Token;
+    public int Status = 200;
 
-    public static class ProcessRequest {
-        private String Token;
-        public int Status = 200;
+    public Process() {
 
-        public ProcessRequest() {
+    }
 
+    public Process(String token) {
+
+        this.Token = token;
+    }
+
+    public String Login() {
+        //Declares a User without a token.
+        User user = new User();
+        try
+        {
+            //As no token is passed the GetDetails and GetTransactions methods will create a new user.
+            //Returning their token, initial balance, currency and transactions.
+            user.GetDetails();
+            user.GetTransaction();
+        }
+        catch (SQLException e) {
+            Status = 400;
+            return "[{Error : " + e.getMessage() + "}]";
         }
 
-        public ProcessRequest(String token) {
-            this.Token = token;
+        //The classes properties are converted to JSON and passed back to the calling class as a string.
+        return ConvertToJSON(user);
+    }
+
+    public String Balance() {
+        if(Token == null){
+            Status = 400;
+            return "Invalid Token";
+        }
+        //Declares a User with a Token, then calls a method to retrieve the Users details, identified by the token.
+        User user = new User(Token);
+        try
+        {
+            user.GetDetails();
+            //Token is set to null so it will not be returned in the JSON. As this is a call for the balance, we only
+            //want the Balance and Currency. The Users transactions are not returned as this property is null because
+            //GetTransactions is not called.
+            user.Token = null;
+        }
+        catch (SQLException e)
+        {
+            Status = 400;
+            return "[{Error : " + e.getMessage() + "}]";
         }
 
-        public String Login() throws IOException {
-            //Declares a new User without a token then calls a method to create a new user and populate User with their details.
-            User user = new User();
-            //The methods within user all return a boolean if false it means an exception has been thrown and caught.
-            if(!user.GetDetails()){
-                Status = 400;
-                return user.ErrorMessage;
-            }
+        return ConvertToJSON(user);
+    }
 
-            //Upon successfully creating the new user and populating the class with said users details.
-            //A two dimensional array that contains the name of the detail and it's value is created, to hold these details.
-            ArrayList<ArrayList<String>> twoDArrayList = new ArrayList<ArrayList<String>>();
-            twoDArrayList.add(new ArrayList<String>(Arrays.asList("Token", user.Token)));
-            twoDArrayList.add(new ArrayList<String>(Arrays.asList("Balance", Integer.toString(user.Balance))));
-            twoDArrayList.add(new ArrayList<String>(Arrays.asList("Currency", user.Currency)));
-
-            //Transactions form their own two dimensional array because their can be multiple
-            //A transaction is made up off a date, description, amount and currency.
-            twoDArrayList.addAll(user.Transactions);
-
-            //The array is converted to JSON and passed back to the calling class.
-            return ConvertToJSON(twoDArrayList);
-        }
-
-        public String Balance() throws IOException {
-            //Declares a User with a Token, then calls a method to retrieve the Users details, identified by the token and populate User with the.
+    public String Transaction() {
+        if(Token == null) {
+            Status = 400;
+            return "Invalid Token";
+        } else {
             User user = new User(Token);
-            if(!user.GetDetails()){
+            try
+            {
+                //The User class gets the transactions associated with the following token and stores each transaction in a list.
+                user.GetTransaction();
+                //Currency is already null.
+                user.Token = null;
+                user.Balance = null;
+            }
+            catch (SQLException e)
+            {
                 Status = 400;
-                return user.ErrorMessage;
+                return "[{Error : " + e.getMessage() + "}]";
             }
 
-            //For a balance request we only require balance and currency to be added to the two dimensional array
-            ArrayList<ArrayList<String>> twoDArrayList = new ArrayList<ArrayList<String>>();
-            twoDArrayList.add(new ArrayList<String>(Arrays.asList("Balance", Integer.toString(user.Balance))));
-            twoDArrayList.add(new ArrayList<String>(Arrays.asList("Currency", user.Currency)));
-
-            return ConvertToJSON(twoDArrayList);
-        }
-
-        public String Transaction() throws IOException {
-            User user = new User(Token);
-            if(!user.GetDetails()){
-                Status = 400;
-                return user.ErrorMessage;
-            }
-
-            //Transactions are already an array so we convert them
-            return ConvertToJSON(user.Transactions);
-        }
-
-        public String Spend(MultiValueMap<String, String> params) throws ParseException {
-            User user = new User(Token);
-            //Converting the date passed to a SQL readable date to be passed to User and then the H2 Database
-            java.util.Date utilDate = new SimpleDateFormat("dd-MM-yyyy").parse(params.get("Date"));
-            java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
-
-            //The parameters are passed to user which adds a transaction based upon these values and updates the users balance
-            if(!user.spend(sqlDate, params.get("Description"), Integer.parseInt(params.get("Amount")), params.get("Currency"))) {
-                Status = 400;
-                return user.ErrorMessage;
-            }
-
-            return "Success";
-        }
-
-        private String ConvertToJSON(ArrayList<ArrayList<String>> list) throws IOException {
-            //Here the ArrayList is converted into JSON format and returned as a String.
-            String output;
-
-            final ObjectMapper mapper = new ObjectMapper();
-            mapper.enable(SerializationFeature.INDENT_OUTPUT);
-            output = mapper.writeValueAsString(list);
-
-            return output;
+            return ConvertToJSON(user);
         }
     }
+
+    public String Spend(MultiValueMap<String, String> params) {
+        if(params.isEmpty()) {
+            Status = 400;
+            return "No Parameters";
+        } else {
+            java.sql.Date sqlDate = null;
+            try {
+                User user = new User(Token);
+                try {
+                    //Converting the date passed to a SQL readable date to be passed to User and then the H2 Database
+                    java.util.Date utilDate = new SimpleDateFormat("dd-MM-yyyy").parse(params.get("Date"));
+                    sqlDate = new java.sql.Date(utilDate.getTime());
+                } catch (ParseException e) {
+                    Status = 400;
+                    return "[{Error : " + e.getMessage() + "}]";
+                }
+                //The parameters are passed to user which adds a transaction based upon these values and updates the users balance.
+                user.spend(sqlDate, params.get("Description"), Integer.parseInt(params.get("Amount")), params.get("Currency"));
+            } catch (SQLException e) {
+                Status = 400;
+                return "[{Error : " + e.getMessage() + "}]";
+            }
+            Status = 201;
+            return "Success";
+        }
+    }
+
+    private String ConvertToJSON(User user) {
+        //Here the class is converted to a JSON format. Each populated property is returned.
+        final byte[] data;
+        try
+        {
+            String output;
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ObjectMapper mapper = new ObjectMapper();
+            //Formatting the transaction date returned within the JSON.
+            DateFormat df = new SimpleDateFormat("dd-MM-yy");
+            mapper.setDateFormat(df);
+
+            //Pretty printer will properly indent the JSON.
+            mapper.writerWithDefaultPrettyPrinter().writeValue(out, user);
+            data = out.toByteArray();
+        }
+        catch (IOException e)
+        {
+            Status = 400;
+            return "[ {Error : " + e.getMessage() + "}]";
+        }
+
+        return (new String(data));
+    }
+
 }
+
