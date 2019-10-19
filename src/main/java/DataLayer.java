@@ -113,11 +113,12 @@ public class DataLayer {
     }
 
     public void AddTransaction(String token, Date date, String description, int amount, String currency) throws SQLException {
+        //INSERT The new transaction
         String sqlInsert = ("INSERT INTO MUCHBETTER_API.TRANSACTIONS (TOKEN, TRANDATE, DESCRIPTION, AMOUNT, CURRENCY) " +
                             "VALUES (?, ?, ?, ?, ?)");
 
         Connection connection = DriverManager.getConnection("jdbc:h2:tcp://localhost/~/test", "sa", "");
-        PreparedStatement statement = connection.prepareStatement(sqlInsert);
+        PreparedStatement statement = connection.prepareStatement(sqlInsert, Statement.RETURN_GENERATED_KEYS);
         statement.setString(1, token);
         statement.setDate(2, (java.sql.Date) date);
         statement.setString(3, description);
@@ -126,24 +127,36 @@ public class DataLayer {
 
         statement.executeUpdate();
 
+        int id;
+        try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+            if (generatedKeys.next()) {
+                //The TransactionID is returned as the generated key rather than any other column as it is the PRIMARY KEY
+                //Column, it has an auto_increments of 1.
+                id = generatedKeys.getInt(1);
+            }
+            else {
+                throw new SQLException("Adding transaction failed, no ID obtained.");
+            }
+        }
+
         //Upon adding any transaction we must update the users balance.
-        UpdateBalance(token);
+        UpdateBalance(token, id);
     }
 
-    private void UpdateBalance(String token) throws SQLException {
-        //The balance is updated with the following CASE statement. SUM() Alone will not correctly return the total value
-        //of said users balance if negative values are present. So instead we get a total of the negative transactions and
-        //subtract them from the total value of the positive transactions.
+    private void UpdateBalance(String token, int id) throws SQLException {
+        //The balance is updated by summing together the balance of the user and the last transaction
+        //The last transaction is identified by the TransactionID passed to this method.
         String sqlUpdate = ("UPDATE MUCHBETTER_API.USERS " +
-                            "SET BALANCE = " +
-                            "(SELECT SUM(CASE WHEN AMOUNT > 0 THEN AMOUNT ELSE 0 END) - SUM(CASE WHEN AMOUNT < 0 THEN ABS(AMOUNT) ELSE 0 END) AS SUM " +
-                            "FROM MUCHBETTER_API.TRANSACTIONS " +
-                            "WHERE TOKEN = ?)" +
+                            "SET BALANCE = BALANCE + (SELECT AMOUNT " +
+                                                     "FROM MUCHBETTER_API.TRANSACTIONS " +
+                                                     "WHERE TRANSACTIONID = ?) " +
                             "WHERE TOKEN = ?");
+
+
 
         Connection connection = DriverManager.getConnection("jdbc:h2:tcp://localhost/~/test", "sa", "");
         PreparedStatement statement = connection.prepareStatement(sqlUpdate);
-        statement.setString(1, token);
+        statement.setInt(1, id);
         statement.setString(2, token);
 
         statement.executeUpdate();
