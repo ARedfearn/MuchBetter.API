@@ -1,6 +1,5 @@
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -43,9 +42,9 @@ public class User {
         Transactions = transactionList;
     }
 
-    public void spend(Date date, String description, int amount, String currency) throws SQLException {
+    public void Spend(Transaction transaction) throws SQLException {
         //The spend method adds a transaction for a specific Token.
         DataLayer dl = new DataLayer();
-        dl.AddTransaction(Token, date, description, amount, currency);
+        dl.AddTransaction(Token, transaction);
     }
 }
