@@ -10,7 +10,6 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
-    jcenter()
 }
 
 dependencies {
@@ -18,8 +17,10 @@ dependencies {
     implementation 'junit:junit:4.12'
     runtimeOnly "org.slf4j:slf4j-simple:1.7.25"
     runtimeOnly "com.h2database:h2:1.4.199"
-    compile ratpack.dependency("dropwizard-metrics")
 }
 
+test {
+    useJUnit()
+}
 ratpack.baseDir = file('ratpack')
 

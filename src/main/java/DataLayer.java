@@ -1,5 +1,5 @@
 import java.sql.*;
-import java.util.Date;
+import java.time.LocalDate;
 
     /*
         The DataLayer accessed the H2 database and executes INSERT, UPDATE and SELECT Statements to Retrieve details from
@@ -27,12 +27,10 @@ public class DataLayer {
 
         String token = user.Token;
         if(user.Token == null){
-            //If no Token is passed we need to add a new User. This is the requirement of the /login endpoint.
+            //If no Token is passed we need to add a new User.
             token = AddUser();
         }
 
-        //Constructing the SQL Statement to be executed by the H2 Database
-        //The users are selected from the USER table part of the MUCHBETTER_API Schema. The ? is a parameter which is set below.
         String sqlSelect = ("SELECT * FROM MUCHBETTER_API.USERS " +
                             "WHERE TOKEN = ?");
 
@@ -41,7 +39,7 @@ public class DataLayer {
         PreparedStatement statement = connection.prepareStatement(sqlSelect);
         statement.setString(1, token);
 
-        //The statement returns a table(result set) from the H2 database which is passed back to the calling class.
+        //The statement returns a table(result set).
         rs = statement.executeQuery();
 
         return rs;
@@ -50,8 +48,6 @@ public class DataLayer {
     public ResultSet GetTransaction(String token) throws SQLException {
         ResultSet rs = null;
 
-        //Constructing the SQL Statement to be executed by the H2 Database
-        //The users are selected from the USER table part of the MUCHBETTER_API Schema. The ? is a parameter which is set below.
         String sqlSelect = ("SELECT * FROM MUCHBETTER_API.TRANSACTIONS " +
                             "WHERE TOKEN = ?");
 
@@ -62,7 +58,6 @@ public class DataLayer {
 
         return rs;
     }
-
 
     private String AddUser() throws SQLException {
         int id = 0;
@@ -76,8 +71,7 @@ public class DataLayer {
 
         try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
             if (generatedKeys.next()) {
-                //The UserID is returned as the generated key rather than any other column as it is the PRIMARY KEY
-                //Column, it has an auto_increments by 1.
+                //The new UserID is returned as the generated key
                 id = generatedKeys.getInt(1);
             }
             else {
@@ -89,9 +83,15 @@ public class DataLayer {
         String token = GetTokenFromID(id);
 
         //Once we have the Token we add an initial transaction for the new User.
-        Date date = new Date();
-        java.sql.Date today = new java.sql.Date(date.getTime());
-        AddTransaction(token, today, "Initial Transaction", 100, "GBP");
+        LocalDate locald = LocalDate.now();
+        java.sql.Date today = java.sql.Date.valueOf(locald);
+
+        Transaction transaction = new Transaction();
+        transaction.Date = today;
+        transaction.Description = "Initial Transaction";
+        transaction.Currency = "GBP";
+        transaction.Amount = 100;
+        AddTransaction(token, transaction);
         return token;
     }
 
@@ -112,26 +112,28 @@ public class DataLayer {
         return token;
     }
 
-    public void AddTransaction(String token, Date date, String description, int amount, String currency) throws SQLException {
-        //INSERT The new transaction
+    public void AddTransaction(String token, Transaction transaction) throws SQLException {
         String sqlInsert = ("INSERT INTO MUCHBETTER_API.TRANSACTIONS (TOKEN, TRANDATE, DESCRIPTION, AMOUNT, CURRENCY) " +
                             "VALUES (?, ?, ?, ?, ?)");
 
         Connection connection = DriverManager.getConnection("jdbc:h2:tcp://localhost/~/test", "sa", "");
         PreparedStatement statement = connection.prepareStatement(sqlInsert, Statement.RETURN_GENERATED_KEYS);
         statement.setString(1, token);
-        statement.setDate(2, (java.sql.Date) date);
-        statement.setString(3, description);
-        statement.setInt(4, amount);
-        statement.setString(5, currency);
+
+        java.util.Date utilDate = transaction.Date;
+        java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+
+        statement.setDate(2, sqlDate);
+        statement.setString(3, transaction.Description);
+        statement.setInt(4, transaction.Amount);
+        statement.setString(5, transaction.Currency);
 
         statement.executeUpdate();
 
         int id;
         try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
             if (generatedKeys.next()) {
-                //The TransactionID is returned as the generated key rather than any other column as it is the PRIMARY KEY
-                //Column, it has an auto_increments of 1.
+                //The new TransactionID is returned as the generated key;
                 id = generatedKeys.getInt(1);
             }
             else {
@@ -139,20 +141,16 @@ public class DataLayer {
             }
         }
 
-        //Upon adding any transaction we must update the users balance.
         UpdateBalance(token, id);
     }
 
     private void UpdateBalance(String token, int id) throws SQLException {
         //The balance is updated by summing together the balance of the user and the last transaction
-        //The last transaction is identified by the TransactionID passed to this method.
         String sqlUpdate = ("UPDATE MUCHBETTER_API.USERS " +
                             "SET BALANCE = BALANCE + (SELECT AMOUNT " +
                                                      "FROM MUCHBETTER_API.TRANSACTIONS " +
                                                      "WHERE TRANSACTIONID = ?) " +
                             "WHERE TOKEN = ?");
-
-
 
         Connection connection = DriverManager.getConnection("jdbc:h2:tcp://localhost/~/test", "sa", "");
         PreparedStatement statement = connection.prepareStatement(sqlUpdate);
