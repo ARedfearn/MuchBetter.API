@@ -20,8 +20,7 @@ public class TestSpend {
         EmbeddedApp.fromHandlers(chain -> chain
                 .path("login", new LoginHandler())
                 .path("spend",new SpendHandler())
-                .path("transaction", new TransactionHandler())
-                .path("balance", new BalanceHandler())
+                .path("transaction", new BalanceHandler())
         ).test(httpClient -> {
             int balance = 0;
 
@@ -41,22 +40,18 @@ public class TestSpend {
                                         .set("Content-Type", "application/json");
                                 requestSpec.getBody().text(Json);
                             }
-                    ).get("spend");
+                    ).post("spend");
+            //refresh
+            httpClient.get("");
 
             assertEquals(201, spendResponse.getStatusCode());
 
-            //Get the balance
-            ReceivedResponse balanceResponse = httpClient
-                    .requestSpec(requestSpec ->
-                            requestSpec.getHeaders().set("Authorization", login.Token)
-                    ).get("balance");
-
-            String jsonBalance = balanceResponse.getBody().getText();
-            User balanceUser = objectMapper.readValue(jsonBalance, User.class);
+            User user = new User(login.Token);
+            user.GetDetails();
 
             //Check if the balance has been updated
             int expectedBalance = balance + 1000;
-            assertEquals(expectedBalance, balanceUser.Balance.intValue());
+            assertEquals(expectedBalance, user.Balance.intValue());
 
             //Clean up DataBase
             CleanDatabase tdl = new CleanDatabase(login.Token);

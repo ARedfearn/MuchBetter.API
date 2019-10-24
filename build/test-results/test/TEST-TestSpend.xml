@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="TestSpend" tests="1" skipped="0" failures="0" errors="0" timestamp="2019-10-23T21:20:32" hostname="DESKTOP-QPJNQET" time="2.302">
+<testsuite name="TestSpend" tests="1" skipped="0" failures="0" errors="0" timestamp="2019-10-23T21:30:37" hostname="DESKTOP-QPJNQET" time="2.236">
   <properties/>
-  <testcase name="testPostSpend" classname="TestSpend" time="2.302"/>
+  <testcase name="testPostSpend" classname="TestSpend" time="2.236"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[[Test worker] INFO ratpack.server.RatpackServer - Starting server...
 [Test worker] INFO ratpack.server.RatpackServer - Building registry...
-[Test worker] INFO ratpack.server.RatpackServer - Ratpack started (development) for http://localhost:55678
+[Test worker] INFO ratpack.server.RatpackServer - Ratpack started (development) for http://localhost:55898
 [ratpack-compute-4-2] ERROR ratpack.error.internal.DefaultDevelopmentErrorHandler - 404 client error for request to /
 [ratpack-compute-4-3] WARN ratpack.file.internal.ResponseTransmitter - An error occurred draining the unread request body. The connection will be closed
 ratpack.http.RequestBodyAlreadyReadException: the request body has already been read
