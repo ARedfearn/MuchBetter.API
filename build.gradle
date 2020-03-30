@@ -1,26 +1,30 @@
-plugins {
-    id "io.ratpack.ratpack-java" version "1.7.5"
-    id 'java'
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "io.ratpack:ratpack-gradle:1.7.6"
+    }
 }
 
-group 'MIR.Interviwer.API'
-version '1.0-SNAPSHOT'
+apply plugin: "io.ratpack.ratpack-java"
+apply plugin: 'java'
+apply plugin: 'idea'
 
-sourceCompatibility = 1.8
+mainClassName = 'Main'
+
+dependencies {
+    compile('io.ratpack:ratpack-guice:1.5.4')
+    compile 'com.fasterxml.jackson.core:jackson-core:2.4.1'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.4.1'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1'
+    runtime "org.slf4j:slf4j-simple:1.7.21"
+    runtimeOnly "com.h2database:h2:1.4.190"
+}
 
 repositories {
+    jcenter()
     mavenCentral()
 }
 
-dependencies {
-    testImplementation 'junit:junit:4.12'
-    implementation 'junit:junit:4.12'
-    runtimeOnly "org.slf4j:slf4j-simple:1.7.25"
-    runtimeOnly "com.h2database:h2:1.4.199"
-}
-
-test {
-    useJUnit()
-}
 ratpack.baseDir = file('ratpack')
-

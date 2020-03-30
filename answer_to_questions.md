@@ -16,7 +16,7 @@
 	})
 	
 	Method References added with lambda expressions alse look really clean when calling an existing method: 
-	ctx.parse(fromJson(Transaction.class)).then(user::Spend);
+	ctx.parse(fromJson(model.Transaction.class)).then(user::Spend);
 	
 3. What is your favourite framework / library / package that you love but couldn't use in the task? What do you like about it so much?
 	
