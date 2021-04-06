@@ -13,7 +13,7 @@ The API will have 4 endpoints and will communicate JSON with at least the follow
 
 ### Technology stack
 
-- [Ratpack](https://ratpack.io) as Java server side framework and redis as the datastore().
+- [Ratpack](https://ratpack.io) as Java server side framework and [Redis](https://redis.io) as the datastore.
 - Developed in Intellij community IDE
 - Backend ran as a standalone java process + the in-memory datastore process
 
