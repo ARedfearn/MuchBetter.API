@@ -4,38 +4,42 @@ public class User {
 
     private String token;
     private String currency;
-    private Integer balance;
+    private int balance;
     private Transaction transaction;
 
     public String getToken() {
         return token;
     }
 
-    public void setToken(String token) {
+    public User setToken(String token) {
         this.token = token;
+        return this;
     }
 
     public String getCurrency() {
         return currency;
     }
 
-    public void setCurrency(String currency) {
+    public User setCurrency(String currency) {
         this.currency = currency;
+        return this;
     }
 
-    public Integer getBalance() {
+    public int getBalance() {
         return balance;
     }
 
-    public void setBalance(Integer balance) {
+    public User setBalance(Integer balance) {
         this.balance = balance;
+        return this;
     }
 
     public Transaction getTransaction() {
         return transaction;
     }
 
-    public void setTransaction(Transaction transaction) {
+    public User setTransaction(Transaction transaction) {
         this.transaction = transaction;
+        return this;
     }
 }

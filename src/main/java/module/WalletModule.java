@@ -7,6 +7,7 @@ import handler.BalanceHandler;
 import handler.LoginHandler;
 import handler.SpendHandler;
 import handler.TransactionHandler;
+import repository.WalletRepository;
 
 public class WalletModule extends AbstractModule {
 
@@ -17,6 +18,7 @@ public class WalletModule extends AbstractModule {
     bind(BalanceHandler.class);
     bind(SpendHandler.class);
     bind(TransactionHandler.class);
+    bind(WalletRepository.class);
   }
 
 }

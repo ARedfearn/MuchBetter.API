@@ -6,7 +6,7 @@ public class Transaction {
 
     private Date date;
     private String description;
-    private Integer amount;
+    private int amount;
     private String currency;
 
     public Date getDate() {

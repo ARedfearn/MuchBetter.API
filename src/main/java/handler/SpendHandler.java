@@ -1,6 +1,5 @@
 package handler;
 
-
 import ratpack.handling.Context;
 import ratpack.handling.Handler;
 
