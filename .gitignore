@@ -4,5 +4,16 @@ out
 bin
 .project
 .classpath
+*.tmp
+*.bak
+*.swp
+*~.nib
 .settings/
+.loadpath
+.recommenders
 .idea/
+*.iws
+.idea_modules/
+*.ipr
+tmp.*
+*.mmdb
