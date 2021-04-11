@@ -10,7 +10,6 @@ bin
 *~.nib
 .settings/
 .loadpath
-.recommenders
 .idea/
 *.iws
 .idea_modules/
