@@ -1,9 +1,6 @@
 package action;
 
-import handler.BalanceHandler;
-import handler.LoginHandler;
-import handler.SpendHandler;
-import handler.TransactionHandler;
+import handler.*;
 import ratpack.func.Action;
 import ratpack.handling.Chain;
 
@@ -14,11 +11,12 @@ public class WalletAction implements Action<Chain> {
 
     walletChain
       .prefix("login", chain -> chain
-        .all(LoginHandler.class)
+        .get(LoginHandler.class)
       )
 
       .prefix("balance", chain -> chain
-        .all(BalanceHandler.class)
+        .all(AuthorizationHeader.class)
+        .get(BalanceHandler.class)
       )
 
       .prefix("spend", chain -> chain

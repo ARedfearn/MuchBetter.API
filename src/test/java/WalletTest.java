@@ -16,4 +16,12 @@ public class WalletTest {
 
     assertThat("Response is empty", responseText.isEmpty(), is(false));
   }
+
+  @Test
+  public void shouldReturnUnauthorized() {
+    ReceivedResponse response = appUnderTest.getHttpClient().post("/balance");
+    int responseStatus = response.getStatusCode();
+
+    assertThat("Response isn't unauthorized", responseStatus, is(401));
+  }
 }
