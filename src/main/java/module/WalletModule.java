@@ -17,7 +17,7 @@ public class WalletModule extends AbstractModule {
     bind(SpendHandler.class);
     bind(TransactionHandler.class);
     bind(WalletRepository.class);
-    bind(AuthorizationHeader.class);
+    bind(AuthorizationHandler.class);
     bind(WalletErrorHandler.class);
   }
 

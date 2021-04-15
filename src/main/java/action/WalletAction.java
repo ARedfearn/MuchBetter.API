@@ -15,7 +15,7 @@ public class WalletAction implements Action<Chain> {
       )
 
       .prefix("balance", chain -> chain
-        .all(AuthorizationHeader.class)
+        .all(AuthorizationHandler.class)
         .get(BalanceHandler.class)
       )
 

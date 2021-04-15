@@ -9,6 +9,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 import java.time.Duration;
+import java.util.Map;
 
 @Singleton
 public class WalletRepository {
@@ -40,5 +41,20 @@ public class WalletRepository {
     }
 
     return user;
+  }
+
+  public User getUser(String token) {
+
+    Map<String, String> map;
+
+    try (Jedis jedis = jedisPool.getResource()) {
+      map = jedis.hgetAll(StringUtils.join("user#", token));
+    }
+
+    if (!map.isEmpty()) {
+      return new User(token)
+        .setCurrency(map.get("currency"))
+        .setBalance(Integer.valueOf(map.get("balance")));
+    } else return null;
   }
 }
