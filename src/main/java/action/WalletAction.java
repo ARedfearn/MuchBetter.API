@@ -11,7 +11,7 @@ public class WalletAction implements Action<Chain> {
 
     walletChain
       .prefix("login", chain -> chain
-        .get(LoginHandler.class)
+        .post(LoginHandler.class)
       )
 
       .prefix("balance", chain -> chain
@@ -20,7 +20,8 @@ public class WalletAction implements Action<Chain> {
       )
 
       .prefix("spend", chain -> chain
-        .all(SpendHandler.class)
+        .all(AuthorizationHandler.class)
+        .post(SpendHandler.class)
       )
 
       .prefix("transaction", chain -> chain

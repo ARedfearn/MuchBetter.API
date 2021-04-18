@@ -2,6 +2,7 @@ package repository;
 
 import com.google.inject.Singleton;
 
+import model.Transaction;
 import model.User;
 import org.apache.commons.lang3.StringUtils;
 import redis.clients.jedis.Jedis;
@@ -32,7 +33,7 @@ public class WalletRepository {
     return poolConfig;
   }
 
-  public User createUser(User user) {
+  public User setUser(User user) {
 
     try (Jedis jedis = jedisPool.getResource()) {
       String key = StringUtils.join("user#", user.getToken());
@@ -56,5 +57,18 @@ public class WalletRepository {
         .setCurrency(map.get("currency"))
         .setBalance(Integer.valueOf(map.get("balance")));
     } else return null;
+  }
+
+  public Transaction setTransaction(String token, Transaction transaction) {
+
+    try (Jedis jedis = jedisPool.getResource()) {
+      String key = StringUtils.join("transaction#", token);
+      jedis.hset(key, "date", transaction.getDate().toString());
+      jedis.hset(key, "description", transaction.getDescription());
+      jedis.hset(key, "amount", transaction.getAmount().toString());
+      jedis.hset(key, "currency", transaction.getCurrency());
+    }
+
+    return transaction;
   }
 }

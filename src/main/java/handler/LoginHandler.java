@@ -27,7 +27,7 @@ public class LoginHandler implements Handler {
 
     Promise.value(ctx)
       .map(context -> createUser())
-      .blockingMap(walletRepository::createUser)
+      .blockingMap(walletRepository::setUser)
       .then(user -> ctx.render(user.getToken()));
   }
 
