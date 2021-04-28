@@ -1,10 +1,10 @@
 buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'io.ratpack:ratpack-gradle:1.7.6'
-    }
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath 'io.ratpack:ratpack-gradle:1.7.6'
+  }
 }
 
 apply plugin: 'io.ratpack.ratpack-java'
@@ -14,19 +14,21 @@ apply plugin: 'idea'
 mainClassName = 'Main'
 
 dependencies {
-    compile('io.ratpack:ratpack-guice:1.5.4')
-    compile 'com.fasterxml.jackson.core:jackson-core:2.4.1'
-    compile 'com.fasterxml.jackson.core:jackson-annotations:2.4.1'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1'
-    runtime 'org.slf4j:slf4j-simple:1.7.21'
-    compile 'redis.clients:jedis:2.9.0'
-    compile 'org.apache.commons:commons-lang3:3.12.0'
-    testCompile 'junit:junit:4.12'
+  compile('io.ratpack:ratpack-guice:1.5.4')
+  compile 'com.fasterxml.jackson.core:jackson-core:2.4.1'
+  compile 'com.fasterxml.jackson.core:jackson-annotations:2.4.1'
+  compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1'
+  implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.0-alpha1'
+  implementation 'org.apache.logging.log4j:log4j-slf4j18-impl:2.14.0'
+  runtime 'org.slf4j:slf4j-simple:1.7.21'
+  compile 'redis.clients:jedis:2.9.0'
+  compile 'org.apache.commons:commons-lang3:3.12.0'
+  testCompile 'junit:junit:4.12'
 }
 
 repositories {
-    jcenter()
-    mavenCentral()
+  jcenter()
+  mavenCentral()
 }
 
 ratpack.baseDir = file('ratpack')

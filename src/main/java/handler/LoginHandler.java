@@ -4,6 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ratpack.exec.Promise;
 import ratpack.handling.Context;
 import ratpack.handling.Handler;
@@ -12,6 +14,8 @@ import util.TokenGenerator;
 
 @Singleton
 public class LoginHandler implements Handler {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(LoginHandler.class);
 
   private static final String DEFAULT_CURRENCY = "EUR";
   private static final int DEFAULT_BALANCE = 100;
@@ -24,6 +28,7 @@ public class LoginHandler implements Handler {
   }
 
   public void handle(Context ctx) {
+    LOGGER.debug("Logging in...");
 
     Promise.value(ctx)
       .map(context -> createUser())
