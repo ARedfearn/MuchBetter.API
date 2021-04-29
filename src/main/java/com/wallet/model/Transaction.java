@@ -1,4 +1,4 @@
-package model;
+package com.wallet.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

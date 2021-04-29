@@ -1,16 +1,16 @@
-package handler;
+package com.wallet.handler;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import model.User;
+import com.wallet.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ratpack.exec.Promise;
 import ratpack.handling.Context;
 import ratpack.handling.Handler;
-import repository.WalletRepository;
-import util.TokenGenerator;
+import com.wallet.repository.WalletRepository;
+import com.wallet.util.TokenGenerator;
 
 @Singleton
 public class LoginHandler implements Handler {

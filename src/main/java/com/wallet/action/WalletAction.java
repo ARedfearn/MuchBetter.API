@@ -1,6 +1,6 @@
-package action;
+package com.wallet.action;
 
-import handler.*;
+import com.wallet.handler.*;
 import ratpack.func.Action;
 import ratpack.handling.Chain;
 

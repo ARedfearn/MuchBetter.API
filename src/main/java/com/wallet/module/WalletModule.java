@@ -1,11 +1,11 @@
-package module;
+package com.wallet.module;
 
 import com.google.inject.AbstractModule;
 
-import action.WalletAction;
-import error.WalletErrorHandler;
-import handler.*;
-import repository.WalletRepository;
+import com.wallet.action.WalletAction;
+import com.wallet.error.WalletErrorHandler;
+import com.wallet.handler.*;
+import com.wallet.repository.WalletRepository;
 
 public class WalletModule extends AbstractModule {
 

@@ -1,6 +1,8 @@
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+import com.wallet.Main;
+
 import org.junit.Test;
 import ratpack.http.client.ReceivedResponse;
 import ratpack.test.MainClassApplicationUnderTest;

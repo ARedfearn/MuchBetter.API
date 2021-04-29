@@ -1,4 +1,4 @@
-package error;
+package com.wallet.error;
 
 import com.google.inject.Singleton;
 

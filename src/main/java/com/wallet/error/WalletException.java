@@ -1,4 +1,4 @@
-package error;
+package com.wallet.error;
 
 public class WalletException extends RuntimeException {
 

@@ -1,5 +1,7 @@
-import action.WalletAction;
-import module.WalletModule;
+package com.wallet;
+
+import com.wallet.action.WalletAction;
+import com.wallet.module.WalletModule;
 import ratpack.guice.Guice;
 import ratpack.server.RatpackServer;
 

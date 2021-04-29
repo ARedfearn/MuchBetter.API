@@ -1,4 +1,4 @@
-package handler;
+package com.wallet.handler;
 
 import ratpack.handling.Context;
 import ratpack.handling.Handler;

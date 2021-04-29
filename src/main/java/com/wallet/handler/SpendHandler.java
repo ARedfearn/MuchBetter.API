@@ -1,16 +1,16 @@
-package handler;
+package com.wallet.handler;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import error.WalletException;
-import model.Transaction;
-import model.User;
+import com.wallet.error.WalletException;
+import com.wallet.model.Transaction;
+import com.wallet.model.User;
 import ratpack.exec.Promise;
 import ratpack.handling.Context;
 import ratpack.handling.Handler;
 import ratpack.jackson.Jackson;
-import repository.WalletRepository;
+import com.wallet.repository.WalletRepository;
 
 @Singleton
 public class SpendHandler implements Handler {

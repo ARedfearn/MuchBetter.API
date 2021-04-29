@@ -1,9 +1,9 @@
-package repository;
+package com.wallet.repository;
 
 import com.google.inject.Singleton;
 
-import model.Transaction;
-import model.User;
+import com.wallet.model.Transaction;
+import com.wallet.model.User;
 import org.apache.commons.lang3.StringUtils;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
