@@ -2,15 +2,15 @@ package com.wallet.handler;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
 import com.wallet.model.User;
+import com.wallet.repository.WalletRepository;
+import com.wallet.util.TokenGenerator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ratpack.exec.Promise;
 import ratpack.handling.Context;
 import ratpack.handling.Handler;
-import com.wallet.repository.WalletRepository;
-import com.wallet.util.TokenGenerator;
 
 @Singleton
 public class LoginHandler implements Handler {
@@ -33,7 +33,11 @@ public class LoginHandler implements Handler {
     Promise.value(ctx)
       .map(context -> createUser())
       .blockingMap(walletRepository::setUser)
-      .then(user -> ctx.render(user.getToken()));
+      .then(user -> ctx
+        .getResponse()
+        .status(200)
+        .send(user.getToken())
+      );
   }
 
   private User createUser() {

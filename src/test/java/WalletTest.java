@@ -1,11 +1,19 @@
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wallet.Main;
+import com.wallet.model.Transaction;
+import com.wallet.model.User;
 
 import org.junit.Test;
 import ratpack.http.client.ReceivedResponse;
 import ratpack.test.MainClassApplicationUnderTest;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
 
 public class WalletTest {
 
@@ -19,6 +27,40 @@ public class WalletTest {
   private String login() {
     ReceivedResponse response = appUnderTest.getHttpClient().post(LOGIN_ENDPOINT);
     return response.getBody().getText();
+  }
+
+  private void createTransaction(String token, String description, int amount) {
+    LocalDateTime now = LocalDateTime.now();
+
+    ReceivedResponse response = appUnderTest
+      .getHttpClient()
+      .request("/spend", requestSpec ->
+        requestSpec.post()
+          .headers(mutableHeaders ->
+            mutableHeaders
+              .set(AUTHORIZATION_HEADER, token)
+              .set("Content-Type", "application/json")
+          )
+          .body(body -> body.text(String.format("{\"date\":\"%s\",\"description\":\"%s\",\"amount\":%s,\"currency\":\"%s\"}", now.toString(), description, Integer.valueOf(amount).toString(), "GBP")))
+      );
+
+    assertThat("Response is not 2XX", response.getStatus().is2xx(), is(true));
+  }
+
+  private int getBalance(String token) throws IOException {
+
+    ReceivedResponse response = appUnderTest
+      .getHttpClient()
+      .request(BALANCE_ENDPOINT, requestSpec ->
+        requestSpec.get().headers(mutableHeaders ->
+          mutableHeaders.set(AUTHORIZATION_HEADER, token)));
+
+    assertThat("Response doesn't contain balance", response.getBody().getText().contains("balance"), is(true));
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    User user = objectMapper.readValue(response.getBody().getText(), User.class);
+
+    return user.getBalance();
   }
 
   @Test
@@ -47,39 +89,34 @@ public class WalletTest {
   }
 
   @Test
-  public void shouldReturnBalance() {
+  public void shouldReturnBalance() throws IOException {
     String token = login();
 
-    ReceivedResponse response = appUnderTest
-      .getHttpClient()
-      .request(BALANCE_ENDPOINT, requestSpec ->
-        requestSpec.get().headers(mutableHeaders ->
-          mutableHeaders.set(AUTHORIZATION_HEADER, token)));
-
-    assertThat("Response doesn't contain balance", response.getBody().getText().contains("Balance"), is(true));
+    assertThat("Balance should be greater than 0", getBalance(token) > 0, is(true));
   }
 
   @Test
-  public void shouldCreateTransaction() {
+  public void shouldCreateTransaction() throws IOException {
     String token = login();
+
+    int startBalance = getBalance(token);
+
+    createTransaction(token, "coffee", 3);
+
+    int endBalance = getBalance(token);
+
+    assertThat("Balance has not been reduced", endBalance < startBalance, is(true));
+  }
+
+  @Test
+  public void shouldReturnTransactions() throws IOException {
+    String token = login();
+
+    createTransaction(token, "pizza", 12);
 
     ReceivedResponse response = appUnderTest
       .getHttpClient()
-      .request("/spend", requestSpec ->
-        requestSpec.post()
-          .headers(mutableHeaders ->
-            mutableHeaders
-              .set(AUTHORIZATION_HEADER, token)
-              .set("Content-Type", "application/json")
-          )
-          .body(body -> body.text("{\"date\":\"2012-04-23T18:25:43.511Z\",\"description\":\"coffee\",\"amount\":3,\"currency\":\"GBP\"}"))
-      );
-
-    assertThat("Response is not 2XX", response.getStatus().is2xx(), is(true));
-
-    ReceivedResponse balanceResponse = appUnderTest
-      .getHttpClient()
-      .request("/balance", requestSpec ->
+      .request("/transactions", requestSpec ->
         requestSpec.get()
           .headers(mutableHeaders ->
             mutableHeaders
@@ -87,6 +124,12 @@ public class WalletTest {
           )
       );
 
-    assertThat("Response has not been reduced", balanceResponse.getBody().getText().contains("97"), is(true));
+    assertThat("Response is not 2XX", response.getStatus().is2xx(), is(true));
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    List<Transaction> transactions = objectMapper.readValue(response.getBody().getText(), new TypeReference<List<Transaction>>() {});
+
+    assertThat("Less thank one transaction", transactions.size() > 0, is(true));
+
   }
 }

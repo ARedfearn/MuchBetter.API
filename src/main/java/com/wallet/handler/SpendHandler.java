@@ -2,15 +2,15 @@ package com.wallet.handler;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
 import com.wallet.error.WalletException;
 import com.wallet.model.Transaction;
 import com.wallet.model.User;
+import com.wallet.repository.WalletRepository;
+
 import ratpack.exec.Promise;
 import ratpack.handling.Context;
 import ratpack.handling.Handler;
 import ratpack.jackson.Jackson;
-import com.wallet.repository.WalletRepository;
 
 @Singleton
 public class SpendHandler implements Handler {
@@ -33,6 +33,10 @@ public class SpendHandler implements Handler {
       )
       .blockingMap(walletRepository::setUser)
       .blockingMap(user -> walletRepository.setTransaction(user.getToken(), user.getTransaction()))
-      .then(pair -> ctx.getResponse().send());
+      .then(pair -> ctx
+        .getResponse()
+        .status(201)
+        .send()
+      );
   }
 }

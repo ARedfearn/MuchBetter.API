@@ -1,6 +1,7 @@
 package com.wallet.action;
 
 import com.wallet.handler.*;
+
 import ratpack.func.Action;
 import ratpack.handling.Chain;
 
@@ -24,8 +25,9 @@ public class WalletAction implements Action<Chain> {
         .post(SpendHandler.class)
       )
 
-      .prefix("transaction", chain -> chain
-        .all(TransactionHandler.class)
+      .prefix("transactions", chain -> chain
+        .all(AuthorizationHandler.class)
+        .get(TransactionHandler.class)
       )
 
       .all(ctx -> ctx.getResponse().status(401).send());

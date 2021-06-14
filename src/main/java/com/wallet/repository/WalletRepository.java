@@ -1,15 +1,18 @@
 package com.wallet.repository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Singleton;
-
 import com.wallet.model.Transaction;
 import com.wallet.model.User;
+
 import org.apache.commons.lang3.StringUtils;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 
 @Singleton
@@ -59,16 +62,28 @@ public class WalletRepository {
     } else return null;
   }
 
-  public Transaction setTransaction(String token, Transaction transaction) {
+  public Transaction setTransaction(String token, Transaction transaction) throws JsonProcessingException {
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    String jsonTransaction = objectMapper.writeValueAsString(transaction);
 
     try (Jedis jedis = jedisPool.getResource()) {
-      String key = StringUtils.join("transaction#", token);
-      jedis.hset(key, "date", transaction.getDate().toString());
-      jedis.hset(key, "description", transaction.getDescription());
-      jedis.hset(key, "amount", transaction.getAmount().toString());
-      jedis.hset(key, "currency", transaction.getCurrency());
+      String key = StringUtils.join("transactions#", token);
+      jedis.lpush(key, jsonTransaction);
     }
 
     return transaction;
+  }
+
+  public List<String> getTransactions(String token) {
+
+    List<String> transactions;
+
+    try (Jedis jedis = jedisPool.getResource()) {
+      String key = StringUtils.join("transactions#", token);
+      transactions = jedis.lrange(key, 0, -1);
+    }
+
+    return transactions;
   }
 }
