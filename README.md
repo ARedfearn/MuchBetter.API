@@ -1,21 +1,50 @@
-### The task
+### MuchBetter Technical Assignment
 
-The task is to create an backend application that provides a set of APIs to be called from a frontend UI.
+The task is to create a service that represents a simplified version of the MuchBetter e-wallet app!
 
-### The API
+We expect the assignemtn to take around a week to complete. Feel free to use any addiotional depedencies/libraries you like. 
 
-The API will have 4 endpoints and will communicate JSON with at least the following functionality for each end point:
+## API
 
-- `/login` -  a POST request that will accept no input and return a `token` (which need to be used in subsequent calls to the API, in the `Authorization` header). Every call  to `/login` will return a new token and every invocation to this endpoint creates a new user, gives them a preset balance in a preset currency. 
-- `/balance` -  a GET request that will accept an `Authorization` header (with the token value output from `/login`) and  will return the current balance along with the currency code.
-- `/transactions` - a GET request that will accept an `Authorization` header (with the token value output from `/login`) and  will return a list of transactions done by the user with atleast the `date`, `description`, `amount`, `currency` for each transaction.
-- `/spend` - a POST request that will accept an `Authorization` header (with the token value output from `/login`), JSON content representing one spend transaction with the transaction `date`, `description`, `amount`, `currency`.
+The service needs four REST endpoints.
 
-### Technology stack
+``` shell
+POST /login
+```
+Accepts no input and returns a `token`. The `token` will need to be supplied in the `Authorization` header in subsequent requests. Every call returns a new token and creates a new user, the user should be created with a preset balance in a preset currency.
 
-- [Ratpack](https://ratpack.io) as Java server side framework and [Redis](https://redis.io) as the datastore.
-- Developed in Intellij community IDE
-- Backend ran as a standalone java process + the in-memory datastore process
+``` shell
+GET /balance
+```
+Accepts an `Authorization` with the token created at login, returns the current balance along with the currency code.
+
+
+``` shell
+GET /transactions
+```
+Accepts an `Authorization` header, with the token created at login, and returns a list of transactions in the format:
+
+
+``` json
+{
+    "date": "2022-01-01",
+    "description": "Coffee",
+    "amount": 10,
+    "currency": "EUR"
+}
+```
+
+``` shell
+POST /spend
+```
+Accepts an `Authorization` header, with the token created at `/login`, and a JSON body representing one transaction in the format detailed above.
+
+
+### Technology Stack
+
+- Java
+- Spring
+- [Redis](https://redis.io) as the in-memory datastore.
 
 ### Requirements
 
@@ -23,6 +52,5 @@ The API will have 4 endpoints and will communicate JSON with at least the follow
 - Feel free to spend as much or as little time on the exercise as you like
 - Feel free to use whatever additional frameworks / libraries / packages you like
 - Your code should be in a state that you would feel comfortable releasing to production
-- The endpoints for the same token might be called from multiple clients concurrently.
 - Writing unit/integration tests are optional but highly encouraged
 - Dockerising the two components is optional and encouraged
