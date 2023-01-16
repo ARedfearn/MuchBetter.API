@@ -2,7 +2,7 @@
 
 The task is to create a service that represents a simplified version of the MuchBetter e-wallet app!
 
-We expect the assignemtn to take around a week to complete. Feel free to use any addiotional depedencies/libraries you like. 
+We expect the assignment to take around a week to complete. Feel free to use any addiotional depedencies/libraries you like. The assignemtn should include unit and integration tests, not a full test suite but a few good examples. Dockerising the service is optional but encouraged.
 
 ## API
 
@@ -45,12 +45,3 @@ Accepts an `Authorization` header, with the token created at `/login`, and a JSO
 - Java
 - Spring
 - [Redis](https://redis.io) as the in-memory datastore.
-
-### Requirements
-
-- Implement the 4 API endpoints
-- Feel free to spend as much or as little time on the exercise as you like
-- Feel free to use whatever additional frameworks / libraries / packages you like
-- Your code should be in a state that you would feel comfortable releasing to production
-- Writing unit/integration tests are optional but highly encouraged
-- Dockerising the two components is optional and encouraged
