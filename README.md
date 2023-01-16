@@ -70,3 +70,7 @@ GET /transactions
     }
 ]
 ```
+
+## Submission
+
+Please upload your finished assignment to either GitHub or GitLab and share the repository link with us via email. Don't squash your commits, it's nice to see how the project develops. Have fun!
