@@ -7,7 +7,7 @@ We expect the assignment to take around a week to complete. Feel free to use any
 ## Technology Stack
 
 - Language Java
-- Framework [Spring Boot](https://spring.io/projects/spring-boot)
+- Framework [Ratpack](https://ratpack.io/)
 - In-Memory datastore [Redis](https://redis.io)
 
 ## API
